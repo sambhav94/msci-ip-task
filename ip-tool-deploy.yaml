@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ip-tool
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ip-tool
+  template:
+    metadata:
+      labels:
+        app: ip-tool
+    spec:
+      containers:
+      - name: ip-tool
+        image: <docker_registry>/ip-tool:latest
+        imagePullPolicy: Always
+        command: ["python3", "ip-tool.py", "--report"]
+        volumeMounts:
+        - name: ip-output
+          mountPath: /output
+      volumes:
+      - name: ip-output
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ip-tool-service
+spec:
+  selector:
+    app: ip-tool
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
